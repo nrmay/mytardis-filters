@@ -10,6 +10,10 @@ Project for developing standardized deployments of filters for MyTardis
 To add a new filter:
 * create a branch from the current master.
 * give the branch a name that represents the filter.
+ 
+To install a filter into a MyTardis instance:
+* clone the filter branch into the folder: tardis/tardis_portal/filter/*Filter Name*/
+* follow the instructions in the README.md file in that folder.
 
 # Current Branches
 
