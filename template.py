@@ -227,5 +227,12 @@ class FilterTemplate(FilterBase):
         # finished with saveMetadata
         return
     
+def make_filter(name='', namespace=''):
+    if not name:
+        raise ValueError("Samfilter requires a name to be defined.")
+    if not namespace:
+        raise ValueError("Samfilter requires a namespace to be defined.")
+    return FilterTemplate(name, namespace)
+    
 make_filter.__doc__ = FilterTemplate.__doc__
 
