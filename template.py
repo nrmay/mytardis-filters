@@ -99,7 +99,7 @@ class FilterTemplate(FilterBase):
         #           params: (dictionary) schema parameters variable.
         #             list: (boolean)    are multiple schemas of this type allowed.
         
-         self.schemas = {
+        self.schemas = {
                             'HD': {'name':'header',
                                    'params': self.params_header,
                                    'list': False},
