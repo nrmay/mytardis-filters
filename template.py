@@ -5,6 +5,7 @@ Created on 17/03/2015
 '''
 from base import FilterBase
 from tardis.tardis_portal.models import DatafileParameterSet
+from FlowCytometryTools import FCMeasurement
 
 class FilterTemplate(FilterBase):
     '''
@@ -22,8 +23,8 @@ class FilterTemplate(FilterBase):
         """
         
         # define schema version and file extensions      
-        self.version = "1.0"
-        self.suffixes = ('.txt', )
+        self.version = "3.1"
+        self.suffixes = ('.fcs', )
         
         # define schema formats
         # schema: dictionary of parameters;
@@ -38,8 +39,37 @@ class FilterTemplate(FilterBase):
         #                            defaults to 'STRING' if none provided.
                
         self.params_header = {
-            'KB': {'name': 'size', 'full_name': 'File Size (KBs)',
-                   'data_type': 'NUMERIC', 'required': True, },
+            'START_DATETIME':   {'name': 'sdt', 'full_name': 'Start Date/Time',
+                                 'data_type': 'DATETIME', },
+            'END_DATETIME':     {'name': 'edt', 'full_name': 'End Date/Time',
+                                 'data_type': 'DATETIME', },
+            'EXP':              {'name': 'exp', 'full_name': 'Experimenter', },
+            'INST':             {'name': 'inst', 'full_name': 'Institution', },
+            'LAST_MODIFIED':    {'name': 'mdt', 
+                                 'full_name': 'Last Modified Date/Time', 
+                                 'data_type': 'DATETIME', },
+            'LAST_MODIFIER':    {'name': 'mdr', 'full_name': 'Last Modifier', },
+            'LOST':             {'name': 'lost', 
+                                 'full_name': 'Number of Events Lost', 
+                                 'data_type': 'NUMERIC', },
+            'MODE':             {'name': 'mode', 
+                                 'full_name': 'Data Acquisition Mode', },
+            'ORIGINALITY':      {'name': 'origin', 
+                                 'full_name': 'Originality of Data', },
+            'PLATEID':          {'name': 'pid', 
+                                 'full_name': 'Plate Identifier', },
+            'PLATENAME':        {'name': 'pname', 'full_name': 'Plate Name', },
+            'PROJ':             {'name': 'proj', 'full_name': 'Project', },
+            'TIMESTEP':         {'name': 'timestep', 'full_name': 'Time Step', 
+                                 'data_type': 'NUMERIC',  },
+            'TOT':              {'name': 'tot', 
+                                 'full_name': 'Total Number of Events', 
+                                 'data_type': 'NUMERIC',  },
+            'VOL':              {'name': 'vol', 
+                                 'full_name': 'Sample Volume Consumed', 
+                                 'data_type': 'NUMERIC',  },
+            'WELLID':           {'name': 'wellid', 
+                                 'full_name': 'Well Identifier', },
         }
         
         
@@ -72,8 +102,12 @@ class FilterTemplate(FilterBase):
         """
         
         result = None
-        self.logger.debug('%s: override to extract meta-data for %s' % (
+        self.logger.debug('%s: starting to extract meta-data for %s' % (
                                                     self.name, target))
+        
+        sample = FCMeasurement(ID='target', datafile=target)
+        logger.debug("sample keys = %s" % sample.meta.keys() )
+        
         return result          
 
 
@@ -92,9 +126,9 @@ class FilterTemplate(FilterBase):
 
 def make_filter(name='', namespace=''):
     if not name:
-        raise ValueError("Samfilter requires a name to be defined.")
+        raise ValueError("fcsfilter requires a name to be defined.")
     if not namespace:
-        raise ValueError("Samfilter requires a namespace to be defined.")
+        raise ValueError("fcsfilter requires a namespace to be defined.")
     return FilterTemplate(name, namespace)
     
 make_filter.__doc__ = Filter.__doc__
