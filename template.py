@@ -115,7 +115,8 @@ class FilterTemplate(FilterBase):
                             'CO': {'name':'comment',
                                    'params': self.params_comment,
                                    'list': True},
-       
+                        }
+        
         # initialise filterbase
         FilterBase.__init__(self, name, namespace,
                             self.version, self.schemas, self.suffixes)
@@ -165,7 +166,7 @@ class FilterTemplate(FilterBase):
         # save each line as a parameter set
         for key, line in metadata.items():
             # get the schema for this line
-            schema_mapping = self.schema_names[key]
+            schema_mapping = self.schemas[key]
             self.logger.debug('%s: schema mapping for key[%s] = %s' % (
                                     self.name, key, str(schema_mapping)))
             schema = self.getSchema(schema_mapping['name'])
