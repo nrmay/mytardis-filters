@@ -99,11 +99,6 @@ class FilterBase(object):
         :param metadata: file header as a multi-level dictionary.
         """
         self.logger.debug('%s: starting!' % (self.name))
-        
-        # save each line as a parameter set
-        for key, line in metadata.items():
-            # get the schema for this line
-
     
         # finished with saveMetadata
         return

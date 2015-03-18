@@ -39,7 +39,7 @@ class FilterTemplate(FilterBase):
                
         self.params_header = {
             'KB': {'name': 'size', 'full_name': 'File Size (KBs)',
-                   'data_type': 'NUMERIC', 'required': True, '},
+                   'data_type': 'NUMERIC', 'required': True, },
         }
         
         
@@ -89,6 +89,13 @@ class FilterTemplate(FilterBase):
                                                     self.name, str(instance)))
         return
 
+
+def make_filter(name='', namespace=''):
+    if not name:
+        raise ValueError("Samfilter requires a name to be defined.")
+    if not namespace:
+        raise ValueError("Samfilter requires a namespace to be defined.")
+    return FilterTemplate(name, namespace)
     
 make_filter.__doc__ = Filter.__doc__
 
