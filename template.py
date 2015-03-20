@@ -38,37 +38,39 @@ class FilterTemplate(FilterBase):
         #       data_type: (string)  'NUMERIC', 'DATETIME', 'STRING'
         #                            defaults to 'STRING' if none provided.
                
-        self.params_header = {
-            'START_DATETIME':   {'name': 'sdt', 'full_name': 'Start Date/Time',
+        self.params_text = {
+            '$START_DATETIME':   {'name': 'sdt', 'full_name': 'Start Date/Time',
                                  'data_type': 'DATETIME', },
-            'END_DATETIME':     {'name': 'edt', 'full_name': 'End Date/Time',
+            '$END_DATETIME':     {'name': 'edt', 'full_name': 'End Date/Time',
                                  'data_type': 'DATETIME', },
-            'EXP':              {'name': 'exp', 'full_name': 'Experimenter', },
-            'INST':             {'name': 'inst', 'full_name': 'Institution', },
-            'LAST_MODIFIED':    {'name': 'mdt', 
+            '$EXP':              {'name': 'exp', 'full_name': 'Experimenter', },
+            '$INST':             {'name': 'inst', 'full_name': 'Institution', },
+            '$LAST_MODIFIED':    {'name': 'mdt', 
                                  'full_name': 'Last Modified Date/Time', 
                                  'data_type': 'DATETIME', },
-            'LAST_MODIFIER':    {'name': 'mdr', 'full_name': 'Last Modifier', },
-            'LOST':             {'name': 'lost', 
+            '$LAST_MODIFIER':    {'name': 'mdr', 'full_name': 'Last Modifier', },
+            '$LOST':             {'name': 'lost', 
                                  'full_name': 'Number of Events Lost', 
                                  'data_type': 'NUMERIC', },
-            'MODE':             {'name': 'mode', 
+            '$MODE':             {'name': 'mode', 
                                  'full_name': 'Data Acquisition Mode', },
-            'ORIGINALITY':      {'name': 'origin', 
+            '$OP':               {'name': 'op', 
+                                 'full_name': 'Data Acquisition Operator', },
+            '$ORIGINALITY':      {'name': 'origin', 
                                  'full_name': 'Originality of Data', },
-            'PLATEID':          {'name': 'pid', 
+            '$PLATEID':          {'name': 'pid', 
                                  'full_name': 'Plate Identifier', },
-            'PLATENAME':        {'name': 'pname', 'full_name': 'Plate Name', },
-            'PROJ':             {'name': 'proj', 'full_name': 'Project', },
-            'TIMESTEP':         {'name': 'timestep', 'full_name': 'Time Step', 
+            '$PLATENAME':        {'name': 'pname', 'full_name': 'Plate Name', },
+            '$PROJ':             {'name': 'proj', 'full_name': 'Project', },
+            '$TIMESTEP':         {'name': 'timestep', 'full_name': 'Time Step', 
                                  'data_type': 'NUMERIC',  },
-            'TOT':              {'name': 'tot', 
+            '$TOT':              {'name': 'tot', 
                                  'full_name': 'Total Number of Events', 
                                  'data_type': 'NUMERIC',  },
-            'VOL':              {'name': 'vol', 
+            '$VOL':              {'name': 'vol', 
                                  'full_name': 'Sample Volume Consumed', 
                                  'data_type': 'NUMERIC',  },
-            'WELLID':           {'name': 'wellid', 
+            '$WELLID':           {'name': 'wellid', 
                                  'full_name': 'Well Identifier', },
         }
         
@@ -82,7 +84,7 @@ class FilterTemplate(FilterBase):
         #             list: (boolean)    are multiple schemas of this type allowed.
         
         self.schemas = {
-            'HD': {'name':'header','params': self.params_header, 'list': False},
+            'TEXT': {'name':'text', 'params': self.params_text, 'list': False},
         }
         
         # initialise filterbase
@@ -98,17 +100,22 @@ class FilterTemplate(FilterBase):
 
         :param target: the file path
         :type target: string
-        :return: file metadata 
         """
         
-        result = None
+        meta = None
         self.logger.debug('%s: starting to extract meta-data for %s' % (
                                                     self.name, target))
-        
-        sample = FCMeasurement(ID='target', datafile=target)
-        logger.debug("sample keys = %s" % sample.meta.keys() )
-        
-        return result          
+        fcspath = r'%s' % target
+        self.logger.debug("%s: fcspath = %s" % (self.name, fcspath))
+
+        try:        
+            sample = FCMeasurement(ID='target', datafile=fcspath)
+            self.logger.debug("%s: sample keys = %s" % (self.name, sample.meta.keys() ))
+            meta = sample.meta
+        except Exception as e:        
+            self.logger.debug("%s: failed with %s" % (self.name, str(e)))
+
+        return meta          
 
 
     def saveMetadata(self, instance, metadata):
@@ -119,8 +126,49 @@ class FilterTemplate(FilterBase):
         :type instance: Dataset_file
         :param metadata: file metadata
         """
-        self.logger.debug('%s: override to save metadata for %s' % (
+        self.logger.debug('%s: starting to save metadata for %s' % (
                                                     self.name, str(instance)))
+
+        # initialize schemas
+        schema_mapping = self.schemas['TEXT'] 
+        schema = self.getSchema(schema_mapping['name'])
+        parameter_names = self.getParameterNames(schema, schema_mapping['params'])
+        
+        parameter_set = DatafileParameterSet(schema=schema, dataset_file=instance)
+        parameter_set.save()
+        self.logger.debug("%s: created parameter_set." % (self.name))
+
+	line = dict()
+
+        # handle matched keys
+	for key in schema_mapping['params'].keys(): 
+           if key in metadata:
+	      line[key] = metadata[key]
+              self.logger.debug("%s: matched parameter[%s] = %s" % (
+					self.name, key, str(metadata[key])))
+
+        # handle dates and times
+        start_date_key = '$DATE'
+        start_time_key = '$BTIM'
+        end_time_key = '$ETIM'
+        mod_date_time_key = '$LAST_MODIFIED'
+        
+        if start_date_key in metadata:
+           self.logger.debug("%s: %s = %s" % (self.name, start_date_key, metadata[start_date_key]))        
+        
+        if start_time_key in metadata:
+           self.logger.debug("%s: %s = %s" % (self.name, start_time_key, metadata[start_time_key]))       
+        
+        if end_time_key in metadata:
+           self.logger.debug("%s: %s = %s" % (self.name, end_time_key, metadata[end_time_key]))  
+        
+        if mod_date_time_key in metadata:
+           self.logger.debug("%s: %s = %s" % (self.name, mod_date_time_key, metadata[mod_date_time_key]))        
+
+        # write parameters
+        self.logger.debug("%s: creating parameters from %s" % (self.name, line))
+        #self.createDatafileParameters(schema_mapping['params'], parameter_set, parameter_names, line)
+
         return
 
 
@@ -131,5 +179,5 @@ def make_filter(name='', namespace=''):
         raise ValueError("fcsfilter requires a namespace to be defined.")
     return FilterTemplate(name, namespace)
     
-make_filter.__doc__ = Filter.__doc__
+make_filter.__doc__ = FilterTemplate.__doc__
 

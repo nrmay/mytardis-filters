@@ -42,6 +42,7 @@ class FilterBase(object):
         """
         
         try:
+            self.logger.debug("%s: start call!" % self.name)
             # get the file in the database
             instance = kwargs.get('instance')
 
@@ -52,18 +53,21 @@ class FilterBase(object):
             if not(filepath.lower().endswith(self.suffixes)):
                 return None
             
-            self.logger.debug("\n%s: filepath = %s" % (self.name, 
+            self.logger.debug("%s: filepath = %s" % (self.name, 
                                                        str(filepath)))
 
+            metadata = self.extractMetadata(filepath)                        
+            self.logger.debug("%s: meta-data = %s" % (self.name, 
+                                                       str(metadata)))
+
             # check its a new file
-            psets = instance.getParameterSets()
-            if not psets:
-                metadata = self.extractMetadata(filepath)                        
-                self.logger.debug("\n%s: meta-data = %s" % (self.name, 
-                                                            str(metadata)))
-                if metadata:
+            if metadata:
+                psets = instance.getParameterSets()
+                if not psets:
                     self.saveMetadata(instance, metadata)
-            
+                else: 
+                    self.updateMetadata(instance, metadata, psets)
+ 
             self.printDatafileMetadata(instance)
             
         except Exception, e:
@@ -98,9 +102,20 @@ class FilterBase(object):
         :param instance: file.
         :param metadata: file header as a multi-level dictionary.
         """
-        self.logger.debug('%s: starting!' % (self.name))
+        self.logger.debug('%s: starting saveMetadata()' % (self.name))
     
         # finished with saveMetadata
+        return
+
+
+    def updateMetadata(self, instance, metadata, psets):
+        """
+        Update the metadata in Dataset_Files parameter sets.
+        """
+
+        self.logger.debug('%s: starting updateMetadata()' % (self.name))
+        
+        # finished
         return
 
     # --------------------------------
@@ -204,7 +219,7 @@ class FilterBase(object):
     def createDatafileParameters(self, tags, paramset, paramnames, metadata):
         """Create the Parameter values for the parameter set
         
-        :param tags: SAMFORMAT parameter details.
+        :param tags: schema parameter details.
         :param paramset: ParameterSet for this schema/datafile.
         :param paramnames: ParameterNames for this schema.
         :param metadata: File metadata line for this schema.
