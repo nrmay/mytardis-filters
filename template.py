@@ -3,9 +3,10 @@ Created on 17/03/2015
 
 @author: Nick
 '''
+import time
 from base import FilterBase
 from dateutil import parser
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta
 from FlowCytometryTools import FCMeasurement
 
 class FilterTemplate(FilterBase):
@@ -149,6 +150,7 @@ class FilterTemplate(FilterBase):
         start_time_key = '$BTIM'
         end_time_key = '$ETIM'
         mod_date_time_key = '$LAST_MODIFIED'
+        time_format = "%H:%M:%S"
         
         if start_date_key in metadata:
             # date is in format dd-mmm-yyyy
@@ -160,13 +162,13 @@ class FilterTemplate(FilterBase):
             # time is in format hh:mm:ss[.cc]
             self.logger.debug("%s: %s = %s" % (self.name, start_time_key, 
                                                metadata[start_time_key]))       
-            start_time = time.strptime(metadata[start_time_key])
+            start_time = time.strptime(metadata[start_time_key], time_format)
             line['$START_DATETIME'] = datetime.combine(start_date, start_time)
             
         if end_time_key in metadata:
             # time is in format hh:mm:ss[.cc]
             self.logger.debug("%s: %s = %s" % (self.name, end_time_key, metadata[end_time_key])) 
-            end_time = time.strptime(metadata[end_time_key]) 
+            end_time = time.strptime(metadata[end_time_key], time_format) 
             end_date = start_date
             if end_time < start_time:
                 end_date = end_date + timedelta(days=1)
