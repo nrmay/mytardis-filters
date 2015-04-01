@@ -4,8 +4,10 @@ Created on 17/03/2015
 @author: Nick
 '''
 from base import FilterBase
-from tardis.tardis_portal.models import DatafileParameterSet
+from dateutil import parser
+from datatime import datetime, timedelta
 from FlowCytometryTools import FCMeasurement
+from datetime import timedelta
 
 class FilterTemplate(FilterBase):
     '''
@@ -150,23 +152,36 @@ class FilterTemplate(FilterBase):
         mod_date_time_key = '$LAST_MODIFIED'
         
         if start_date_key in metadata:
-            self.logger.debug("%s: %s = %s" % (self.name, start_date_key, metadata[start_date_key]))        
+            # date is in format dd-mmm-yyyy
+            self.logger.debug("%s: %s = %s" % (self.name, start_date_key, 
+                                               metadata[start_date_key]))    
+            start_date = parser.parse(metadata[start_date_key])    
         
         if start_time_key in metadata:
-            self.logger.debug("%s: %s = %s" % (self.name, start_time_key, metadata[start_time_key]))       
-        
+            # time is in format hh:mm:ss[.cc]
+            self.logger.debug("%s: %s = %s" % (self.name, start_time_key, 
+                                               metadata[start_time_key]))       
+            start_time = parser.parse(metadata[start_time_key])
+            line['$START_DATETIME'] = datetime.combine(start_date, start_time)
+            
         if end_time_key in metadata:
-            self.logger.debug("%s: %s = %s" % (self.name, end_time_key, metadata[end_time_key]))  
+            # time is in format hh:mm:ss[.cc]
+            self.logger.debug("%s: %s = %s" % (self.name, end_time_key, metadata[end_time_key])) 
+            end_time = parser.parse(metadata[end_time_key]) 
+            end_date = start_date
+            if end_time < start_time:
+                end_date = end_date + timedelta(days=1)
+            line['$END_DATETIME'] = datetime.combine(end_date, end_time)
         
         if mod_date_time_key in metadata:
             self.logger.debug("%s: %s = %s" % (self.name, mod_date_time_key, metadata[mod_date_time_key]))        
-
+            line[mod_date_time_key] = parser.parse(metadata[mod_date_time_key])
+                
+            
         # write parameters
-        self.logger.debug("%s: creating parameters from %s" % (self.name, line))
-        #self.createDatafileParameters(schema_mapping['params'], parameter_set, parameter_names, line)
-
         if line:
             # create parameter set
+            self.logger.debug("%s: creating parameters from %s" % (self.name, line))
             parameter_set = self.getDatafileParameterSet(instance,schema)
             parameter_set.save()
             self.logger.debug("%s: created parameter_set." % (self.name))
