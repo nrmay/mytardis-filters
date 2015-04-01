@@ -5,9 +5,8 @@ Created on 17/03/2015
 '''
 from base import FilterBase
 from dateutil import parser
-from datatime import datetime, timedelta
+from datetime import datetime, timedelta
 from FlowCytometryTools import FCMeasurement
-from datetime import timedelta
 
 class FilterTemplate(FilterBase):
     '''
