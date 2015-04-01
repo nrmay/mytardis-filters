@@ -5,7 +5,7 @@ Created on 17/03/2015
 '''
 from base import FilterBase
 from dateutil import parser
-from datetime import datetime, timedelta
+from datetime import timedelta
 from FlowCytometryTools import FCMeasurement
 
 class FilterTemplate(FilterBase):
@@ -157,7 +157,7 @@ class FilterTemplate(FilterBase):
                                                metadata[start_time_key]))       
                 start_time = parser.parse("%s %s" % (metadata[start_date_key],
                                                  metadata[start_time_key]))
-                line['$START_DATETIME'] = start_time
+                line['$START_DATETIME'] = start_time.isoformat()
             
             if end_time_key in metadata:
                 # time is in format hh:mm:ss[.cc]
@@ -166,11 +166,12 @@ class FilterTemplate(FilterBase):
                                                metadata[end_time_key]))
                 if end_time < start_time:
                     end_time = end_time + timedelta(days=1)
-                line['$END_DATETIME'] = end_time
+                line['$END_DATETIME'] = end_time.isoformat()
         
         if mod_date_time_key in metadata:
             self.logger.debug("%s: %s = %s" % (self.name, mod_date_time_key, metadata[mod_date_time_key]))        
-            line[mod_date_time_key] = parser.parse(metadata[mod_date_time_key])
+            mod_time = parser.parse(metadata[mod_date_time_key])
+            line[mod_date_time_key] = mod_time.isoformat()
                 
             
         # write parameters
