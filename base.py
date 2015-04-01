@@ -5,10 +5,12 @@ Created on 13 Mar 2015
 '''
 
 import logging
-from tardis.tardis_portal.models import Schema
-from tardis.tardis_portal.models import ParameterName, DatafileParameter
 from pprint import pformat
 from dateutil import parser
+from tardis.tardis_portal.models import Schema
+from tardis.tardis_portal.models import ParameterName
+from tardis.tardis_portal.models import DatafileParameter
+from tardis.tardis_portal.models import DatafileParameterSet
 
 
 class FilterBase(object):
@@ -261,6 +263,19 @@ class FilterBase(object):
 
         # finished
         return   
+
+    # --------------------------------
+    # get datafile parameter set 
+    # --------------------------------
+    def getDatafileParameterSet(self, datafile, schema):
+        """
+        Get the Parameter Set for the file and schema.        
+        :param schema: schema name.
+        :param file: dataset_file.
+        """
+
+        return DatafileParameterSet(schema=schema, dataset_file=datafile)
+
 
     # ----------------------------------
     # sets the parameter value and saves

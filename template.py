@@ -134,18 +134,14 @@ class FilterTemplate(FilterBase):
         schema = self.getSchema(schema_mapping['name'])
         parameter_names = self.getParameterNames(schema, schema_mapping['params'])
         
-        parameter_set = DatafileParameterSet(schema=schema, dataset_file=instance)
-        parameter_set.save()
-        self.logger.debug("%s: created parameter_set." % (self.name))
-
-	line = dict()
+        line = dict()
 
         # handle matched keys
-	for key in schema_mapping['params'].keys(): 
-           if key in metadata:
-	      line[key] = metadata[key]
-              self.logger.debug("%s: matched parameter[%s] = %s" % (
-					self.name, key, str(metadata[key])))
+        for key in schema_mapping['params'].keys(): 
+            if key in metadata:
+                line[key] = metadata[key]
+                self.logger.debug("%s: matched parameter[%s] = %s" % (
+					                 self.name, key, str(metadata[key])))
 
         # handle dates and times
         start_date_key = '$DATE'
@@ -154,20 +150,32 @@ class FilterTemplate(FilterBase):
         mod_date_time_key = '$LAST_MODIFIED'
         
         if start_date_key in metadata:
-           self.logger.debug("%s: %s = %s" % (self.name, start_date_key, metadata[start_date_key]))        
+            self.logger.debug("%s: %s = %s" % (self.name, start_date_key, metadata[start_date_key]))        
         
         if start_time_key in metadata:
-           self.logger.debug("%s: %s = %s" % (self.name, start_time_key, metadata[start_time_key]))       
+            self.logger.debug("%s: %s = %s" % (self.name, start_time_key, metadata[start_time_key]))       
         
         if end_time_key in metadata:
-           self.logger.debug("%s: %s = %s" % (self.name, end_time_key, metadata[end_time_key]))  
+            self.logger.debug("%s: %s = %s" % (self.name, end_time_key, metadata[end_time_key]))  
         
         if mod_date_time_key in metadata:
-           self.logger.debug("%s: %s = %s" % (self.name, mod_date_time_key, metadata[mod_date_time_key]))        
+            self.logger.debug("%s: %s = %s" % (self.name, mod_date_time_key, metadata[mod_date_time_key]))        
 
         # write parameters
         self.logger.debug("%s: creating parameters from %s" % (self.name, line))
         #self.createDatafileParameters(schema_mapping['params'], parameter_set, parameter_names, line)
+
+        if line:
+            # create parameter set
+            parameter_set = self.getDatafileParameterSet(instance,schema)
+            parameter_set.save()
+            self.logger.debug("%s: created parameter_set." % (self.name))
+            
+            # added data
+            self.createDatafileParameters(schema_mapping['params'], 
+                                          parameter_set, 
+                                          parameter_names,  
+                                          line)
 
         return
 
