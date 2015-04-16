@@ -63,13 +63,14 @@ class FilterBase(object):
                                                        str(metadata)))
 
             # check its a new file
-            if metadata:
-                psets = instance.getParameterSets()
-                if not psets:
+            psets = instance.getParameterSets()
+            if not psets:
+                metadata = self.extractMetadata(filepath)                        
+                self.logger.debug("\n%s: meta-data = %s" % (self.name, 
+                                                            str(metadata)))
+                if metadata:
                     self.saveMetadata(instance, metadata)
-                else: 
-                    self.updateMetadata(instance, metadata, psets)
- 
+            
             self.printDatafileMetadata(instance)
             
         except Exception, e:
@@ -107,17 +108,6 @@ class FilterBase(object):
         self.logger.debug('%s: starting saveMetadata()' % (self.name))
     
         # finished with saveMetadata
-        return
-
-
-    def updateMetadata(self, instance, metadata, psets):
-        """
-        Update the metadata in Dataset_Files parameter sets.
-        """
-
-        self.logger.debug('%s: starting updateMetadata()' % (self.name))
-        
-        # finished
         return
 
     # --------------------------------
