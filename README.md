@@ -19,13 +19,6 @@ To install a filter into a MyTardis instance:
 
 ## fcsformat
 
-Add the following definition to the POST_SAVE_FILTERS:
-
-POST_SAVE_FILTERS = [
-    ("tardis.tardis_portal.filters.fcsformat.template.make_filter",
-        ["fcsformat", "http://mytardis.org/fcsformat/"]),
-]
-
 Extracts meta-data from Flow Cytometry data files 
 --- as described in the following document:
 
@@ -34,7 +27,17 @@ Extracts meta-data from Flow Cytometry data files
 * Version: 	   FCS 3.1
 * Publisher:   International Society for Advancement of Cytometry
 * Source:      [Specification document](http://isac-net.org/getdoc/9cbeb83d-99e4-41ac-b68c-c9ab97b180c6/fcs3-1_normativespecification_20090813.aspx)
-* Requires:    flowcytometrytools (pip install git+http://bitbucket.org/nrmay/flowcytometrytools.git)
+* Requires:    flowcytometrytools 
+  * pip install git+http://bitbucket.org/nrmay/flowcytometrytools.git
 * Packages:    
-** CentOS: blas-devel lapach-devel atlas-devel freetype freetype-devel libpng-devel 
-** Ubuntu: TBA
+  * CentOS: blas-devel lapach-devel atlas-devel freetype freetype-devel libpng-devel 
+  * Ubuntu: TBA
+
+Add the following definition to the POST_SAVE_FILTERS:
+
+```python 
+POST_SAVE_FILTERS = [
+   ("tardis.tardis_portal.filters.fcsformat.template.make_filter",
+      ["fcsformat", "http://mytardis.org/fcsformat/"]),
+]
+```
