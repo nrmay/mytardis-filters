@@ -30,8 +30,13 @@ Extracts meta-data from Flow Cytometry data files
 * Requires:    flowcytometrytools 
   * pip install git+http://bitbucket.org/nrmay/flowcytometrytools.git
 * Packages:    
-  * CentOS: blas-devel lapach-devel atlas-devel freetype freetype-devel libpng-devel 
-  * Ubuntu: TBA
+  * CentOS: 
+    * blas-devel lapach-devel atlas-devel freetype freetype-devel libpng-devel 
+  * Ubuntu: 
+    * python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose libblas-dev  liblapack-dev libatlas-base-dev libatlas-dev libfreetype6 libfreetype6-dev  libpng-dev
+    * If installation fails the first time, execute the following:
+      1. add-apt-repository universe 
+      2. apt-get update 
 
 Add the following definition to the POST_SAVE_FILTERS:
 
