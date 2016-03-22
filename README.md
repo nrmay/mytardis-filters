@@ -28,15 +28,18 @@ Extracts meta-data from Flow Cytometry data files
 * Publisher:   International Society for Advancement of Cytometry
 * Source:      [Specification document](http://isac-net.org/getdoc/9cbeb83d-99e4-41ac-b68c-c9ab97b180c6/fcs3-1_normativespecification_20090813.aspx)
 * Requires:    flowcytometrytools 
-```bash
-pip install git+http://bitbucket.org/nrmay/flowcytometrytools.git
-```
+  
+  ```bash
+  pip install git+http://bitbucket.org/nrmay/flowcytometrytools.git
+  ```
 * Packages:    
-  * CentOS: 
+  * CentOS:
+  
   ```bash
   yum install -y blas-devel lapach-devel atlas-devel freetype freetype-devel libpng-devel 
   ```
   * Ubuntu: 
+  
   ```bash
   apt-get install -y python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose libblas-dev liblapack-dev libatlas-base-dev libatlas-dev libfreetype6 libfreetype6-dev  libpng-dev
   ```
